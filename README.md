@@ -1,50 +1,125 @@
-# Calculadora de Honorários Contábeis (FeeSync)
+﻿# FeeSync — Calculadora de Honorarios Contabeis
 
-Esta é uma aplicação web Full-Stack desenvolvida para facilitar a precificação de honorários contábeis de escritórios. A ferramenta processa dados sobre os custos operacionais do escritório e o perfil tributário do cliente para fornecer o piso de custo, valor recomendado (com base em margem de lucro alvo) e uma referência de mercado.
+Aplicacao web Full-Stack para precificacao inteligente de honorarios contabeis. Processa dados operacionais do escritorio e o perfil completo do cliente para calcular o **piso de custo**, **valor recomendado** (com margem de lucro) e uma **referencia de mercado** baseada em regime tributario e ramo de atividade.
 
-## Estrutura de Tecnologias
+## Tecnologias
 
-- **Backend:** Python com Flask.
-- **Banco de Dados:** SQLite (via SQLAlchemy).
-- **Frontend:** HTML5, Vanilla CSS3 (estilo Bento Grid e Glassmorphism) e JavaScript para requisições via Fetch API.
+| Camada    | Tecnologia                                  |
+|-----------|---------------------------------------------|
+| Backend   | Python 3.8+ / Flask                         |
+| Banco     | SQLite (SQLAlchemy ORM)                      |
+| Frontend  | HTML5, Vanilla CSS, JavaScript (Fetch API)   |
 
-## Pré-requisitos
+## Estrutura de Arquivos
 
-Certifique-se de possuir o Python 3.8 ou superior instalado em sua máquina.
+```
+fee-sync-app/
++-- app.py                    # Servidor Flask + motor de calculo
++-- models.py                 # Modelos SQLAlchemy
++-- requirements.txt          # Dependencias Python
++-- templates/
+!   +-- index.html            # Template principal
++-- static/
+    +-- css/
+    !   +-- style.css         # Design system SaaS escuro
+    +-- js/
+        +-- main.js           # Mascara moeda, fetch, animacoes
+```
 
-## Como executar localmente
+## Motor de Calculo
 
-1. Clone o repositório:
+### Entradas
+
+**Escritorio:**
+- `custo_fixo_mensal` (R$) — soma de aluguel, folha, utilidades e licencas
+- `horas_produtivas_mes` — total de horas produtivas da equipe
+- `margem_lucro_alvo` (%) — margem pretendida
+
+**Cliente:**
+- `nome_empresa`
+- `regime_tributario` — MEI, Simples Nacional, Lucro Presumido, Lucro Real
+- `ramo_atividade` — Servico, Comercio, Industria (peso de complexidade: Industria > Comercio > Servico)
+- `volume_nfe` — faixa mensal de documentos fiscais (Ate 20, 21-80, 81-200, 200+)
+- `num_funcionarios_socios` — quantidade para apuracao de folha/pro-labore
+
+### Formula
+
+```
+Custo/Hora = custo_fixo_mensal / horas_produtivas_mes
+
+Horas do Cliente = Horas Base (regime)
+                 + Horas NFe (volume)
+                 + num_funcionarios * 0.5h
+                 + Adicional (ramo)
+
+Piso de Custo      = Horas do Cliente x Custo/Hora
+Valor Recomendado  = Piso de Custo / (1 - margem/100)
+Ref. Mercado       = Faixa (Min, Max) baseada em regime x ramo
+```
+
+## Como Executar
+
+1. Clone o repositorio:
 ```bash
-git clone https://github.com/[seu-usuario]/fee-sync-app.git
+git clone https://github.com/MatheusLeo26/fee-sync-app.git
 cd fee-sync-app
 ```
 
 2. Crie e ative um ambiente virtual:
 ```bash
 python -m venv venv
-# No Windows
+# Windows
 venv\Scripts\activate
-# No Linux/Mac
+# Linux/Mac
 source venv/bin/activate
 ```
 
-3. Instale as dependências:
+3. Instale as dependencias:
 ```bash
 pip install -r requirements.txt
 ```
 
-4. Execute a aplicação:
+4. Execute:
 ```bash
 python app.py
 ```
 
-A aplicação iniciará em `http://localhost:5000`. Na primeira execução, o banco de dados `fee_sync.db` será criado automaticamente.
+Acesse `http://localhost:5000`. O banco `fee_sync.db` sera criado automaticamente na primeira execucao.
 
-## Arquitetura e Modelagem de Dados
+## API
 
-A persistência de dados conta com duas entidades principais:
-- **ConfiguracaoEscritorio**: Armazena parâmetros base como custo fixo mensal, horas produtivas e margem de lucro.
-- **PrecificacaoCliente**: Guarda o histórico de cálculos realizados e o regime tributário de cada cliente analisado.
+### POST /api/calcular
 
-Desenvolvido para entregar agilidade e precisão no fechamento de propostas de serviços contábeis.
+**Request body (JSON):**
+```json
+{
+  "custo_fixo_mensal": 15000,
+  "horas_produtivas_mes": 160,
+  "margem_lucro_alvo": 30,
+  "nome_empresa": "Tech Solutions Ltda",
+  "regime_tributario": "simples",
+  "ramo_atividade": "comercio",
+  "volume_nfe": "21_a_80",
+  "num_funcionarios_socios": 5
+}
+```
+
+**Response (JSON):**
+```json
+{
+  "piso_custo": 1312.5,
+  "valor_recomendado": 1875.0,
+  "mercado_min": 700,
+  "mercado_max": 1500,
+  "horas_estimadas": 14.0
+}
+```
+
+## Modelagem de Dados
+
+- **ConfiguracaoEscritorio**: Parametros base do escritorio (custo fixo, horas, margem).
+- **PrecificacaoCliente**: Historico de calculos com todos os campos do cliente e resultados.
+
+---
+
+Desenvolvido para entregar agilidade e precisao no fechamento de propostas de servicos contabeis.
