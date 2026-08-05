@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FeeSync - Calculadora de Honorários Contábeis</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-primary: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-gradient: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            --success-color: #10b981;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.15), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.15), transparent 25%);
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .card-config {
+            grid-column: span 6;
+        }
+
+        .card-client {
+            grid-column: span 6;
+        }
+
+        .card-results {
+            grid-column: span 12;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            padding: 0;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+        }
+        
+        .card-results:hover {
+            transform: none;
+        }
+
+        .result-item {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            text-align: center;
+            backdrop-filter: blur(12px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .result-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--accent-gradient);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .result-item:hover::before {
+            opacity: 1;
+        }
+
+        .result-item h3 {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .result-item .value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .result-item.highlight .value {
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--card-border);
+            border-radius: 0.75rem;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-control:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+        
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2394a3b8%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem top 50%;
+            background-size: 0.65rem auto;
+        }
+
+        .btn-calculate {
+            grid-column: span 12;
+            padding: 1rem;
+            border: none;
+            border-radius: 0.75rem;
+            background: var(--accent-gradient);
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+            margin-top: 1rem;
+        }
+
+        .btn-calculate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5);
+        }
+        
+        .btn-calculate:active {
+            transform: translateY(0);
+        }
+
+        /* Error state */
+        .error-message {
+            color: #ef4444;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        @media (max-width: 900px) {
+            .card-config, .card-client {
+                grid-column: span 12;
+            }
+            
+            .card-results {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header class="header">
+            <h1>FeeSync</h1>
+            <p>Precificação Inteligente de Honorários Contábeis</p>
+        </header>
+
+        <form id="calcForm" class="bento-grid">
+            
+            <!-- Card 1: Configuração -->
+            <div class="card card-config">
+                <div class="card-title">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="15"></line><line x1="15" y1="9" x2="9" y2="15"></line></svg>
+                    Configuração do Escritório
+                </div>
+                
+                <div class="form-group">
+                    <label for="custoFixo">Custo Fixo Mensal (R$)</label>
+                    <input type="number" id="custoFixo" class="form-control" placeholder="Ex: 15000" required min="1" step="0.01">
+                </div>
+                
+                <div class="form-group">
+                    <label for="horasProdutivas">Horas Produtivas / Mês (Equipe)</label>
+                    <input type="number" id="horasProdutivas" class="form-control" placeholder="Ex: 160" required min="1">
+                </div>
+                
+                <div class="form-group">
+                    <label for="margemLucro">Margem de Lucro Alvo (%)</label>
+                    <input type="number" id="margemLucro" class="form-control" placeholder="Ex: 30" required min="1" max="99" step="0.1">
+                </div>
+            </div>
+
+            <!-- Card 2: Cliente -->
+            <div class="card card-client">
+                <div class="card-title">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    Perfil do Cliente
+                </div>
+                
+                <div class="form-group">
+                    <label for="nomeCliente">Nome da Empresa</label>
+                    <input type="text" id="nomeCliente" class="form-control" placeholder="Ex: Tech Solutions Ltda" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="regimeTributario">Regime Tributário</label>
+                    <select id="regimeTributario" class="form-control" required>
+                        <option value="mei">MEI (Microempreendedor Individual)</option>
+                        <option value="simples" selected>Simples Nacional</option>
+                        <option value="presumido">Lucro Presumido</option>
+                        <option value="real">Lucro Real</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn-calculate" id="submitBtn">Calcular Honorários</button>
+
+            <!-- Painel de Resultados -->
+            <div class="card-results" id="resultados">
+                <div class="result-item">
+                    <h3>Piso de Custo</h3>
+                    <div class="value" id="resPiso">R$ 0,00</div>
+                    <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.5rem;">Custo operacional mínimo</p>
+                </div>
+                
+                <div class="result-item highlight">
+                    <h3>Recomendado</h3>
+                    <div class="value" id="resRecomendado">R$ 0,00</div>
+                    <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.5rem;">Valor ideal com margem</p>
+                </div>
+                
+                <div class="result-item">
+                    <h3>Ref. Mercado</h3>
+                    <div class="value" id="resMercado" style="font-size: 1.8rem; margin-top: 0.5rem;">-</div>
+                    <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.5rem;">Média praticada (Est.)</p>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const formatCurrency = (value) => {
+            return new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            }).format(value);
+        };
+
+        const animateValue = (obj, start, end, duration, isCurrency = true) => {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const current = progress * (end - start) + start;
+                obj.innerHTML = isCurrency ? formatCurrency(current) : current;
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        };
+
+        document.getElementById('calcForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const btn = document.getElementById('submitBtn');
+            const originalText = btn.innerText;
+            btn.innerText = 'Calculando...';
+            btn.disabled = true;
+
+            const payload = {
+                custo_fixo: document.getElementById('custoFixo').value,
+                horas_produtivas: document.getElementById('horasProdutivas').value,
+                margem_lucro: document.getElementById('margemLucro').value,
+                nome_cliente: document.getElementById('nomeCliente').value,
+                regime: document.getElementById('regimeTributario').value
+            };
+
+            try {
+                const response = await fetch('/api/calcular', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    const elPiso = document.getElementById('resPiso');
+                    const elRecomendado = document.getElementById('resRecomendado');
+                    const elMercado = document.getElementById('resMercado');
+                    
+                    animateValue(elPiso, 0, data.piso_custo, 1000);
+                    animateValue(elRecomendado, 0, data.valor_recomendado, 1000);
+                    
+                    elMercado.style.opacity = 0;
+                    setTimeout(() => {
+                        elMercado.innerText = data.referencia_mercado;
+                        elMercado.style.transition = 'opacity 0.5s ease';
+                        elMercado.style.opacity = 1;
+                    }, 300);
+
+                } else {
+                    alert('Erro: ' + (data.error || 'Falha ao processar os dados.'));
+                }
+            } catch (error) {
+                console.error('Erro na requisição:', error);
+                alert('Ocorreu um erro de conexão.');
+            } finally {
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
