@@ -1,6 +1,5 @@
 ﻿/* ==========================================================================
    FeeSync Design System — Handcrafted SaaS
-   Paleta Slate sóbria, tipografia Inter, componentes polidos
    ========================================================================== */
 
 /* --- CSS Reset & Base --- */
@@ -17,25 +16,26 @@
     --bg-primary: #0F172A;
     --bg-surface: #1E293B;
     --bg-surface-hover: #263548;
-    --bg-input: #0F172A;
 
     /* Borders */
     --border-default: #334155;
     --border-hover: #475569;
-    --border-focus: #3B82F6;
+    --border-focus: #10B981;
 
     /* Text */
-    --text-primary: #F1F5F9;
+    --text-primary: #F8FAFC;
     --text-secondary: #94A3B8;
     --text-muted: #64748B;
 
     /* Accents */
-    --accent-blue: #3B82F6;
-    --accent-blue-hover: #2563EB;
+    --accent-primary: #10B981;
+    --accent-primary-hover: #059669;
+    
     --accent-emerald: #10B981;
     --accent-emerald-dim: rgba(16, 185, 129, 0.12);
     --accent-amber: #F59E0B;
     --accent-amber-dim: rgba(245, 158, 11, 0.12);
+    --accent-blue: #3B82F6;
     --accent-blue-dim: rgba(59, 130, 246, 0.12);
 
     /* Danger */
@@ -54,13 +54,13 @@
     --space-xl: 32px;
     --space-2xl: 48px;
 
-    /* Shadows — subtle, no colored glows */
+    /* Shadows */
     --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
     --shadow-card-hover: 0 4px 12px rgba(0, 0, 0, 0.35);
 
     /* Transitions */
-    --transition-fast: 150ms ease;
-    --transition-base: 250ms ease;
+    --transition-fast: 150ms ease-in-out;
+    --transition-base: 200ms ease-in-out;
 }
 
 html {
@@ -99,14 +99,14 @@ body {
 .app-header__logo {
     width: 32px;
     height: 32px;
-    background: var(--accent-blue);
+    background: var(--accent-primary);
     border-radius: var(--radius-sm);
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 700;
     font-size: 14px;
-    color: #fff;
+    color: #FFFFFF;
     letter-spacing: -0.5px;
     flex-shrink: 0;
 }
@@ -124,6 +124,21 @@ body {
     margin-left: 40px;
 }
 
+/* --- Grid Layout --- */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-lg);
+    margin-bottom: var(--space-lg);
+    align-items: stretch;
+}
+
+@media (max-width: 768px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* --- Card --- */
 .card {
     background: var(--bg-surface);
@@ -131,7 +146,9 @@ body {
     border-radius: var(--radius-lg);
     padding: var(--space-lg);
     box-shadow: var(--shadow-card);
-    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+    transition: all var(--transition-base);
+    display: flex;
+    flex-direction: column;
 }
 
 .card:hover {
@@ -158,14 +175,9 @@ body {
     flex-shrink: 0;
 }
 
-.card__icon--config {
-    background: var(--accent-blue-dim);
-    color: var(--accent-blue);
-}
-
-.card__icon--client {
+.card__icon--config, .card__icon--client {
     background: var(--accent-emerald-dim);
-    color: var(--accent-emerald);
+    color: var(--accent-primary);
 }
 
 .card__icon svg {
@@ -174,29 +186,15 @@ body {
 }
 
 .card__title {
-    font-size: 15px;
+    font-size: 1.125rem;
     font-weight: 600;
-    color: var(--text-primary);
+    color: #F8FAFC;
     letter-spacing: -0.2px;
 }
 
 .card__description {
-    font-size: 13px;
-    color: var(--text-muted);
-}
-
-/* --- Grid Layout --- */
-.form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-lg);
-    margin-bottom: var(--space-lg);
-}
-
-@media (max-width: 768px) {
-    .form-grid {
-        grid-template-columns: 1fr;
-    }
+    font-size: 0.875rem;
+    color: var(--text-secondary);
 }
 
 /* --- Form Group --- */
@@ -214,7 +212,7 @@ body {
     gap: var(--space-xs);
     font-size: 13px;
     font-weight: 500;
-    color: var(--text-secondary);
+    color: #94A3B8;
     margin-bottom: var(--space-sm);
 }
 
@@ -231,11 +229,11 @@ body {
     font-size: 10px;
     font-weight: 700;
     cursor: help;
-    transition: background var(--transition-fast), color var(--transition-fast);
+    transition: all var(--transition-base);
 }
 
 .form-label__help:hover {
-    background: var(--accent-blue);
+    background: var(--accent-primary);
     color: #fff;
 }
 
@@ -244,9 +242,9 @@ body {
     bottom: calc(100% + 8px);
     left: 50%;
     transform: translateX(-50%);
-    background: var(--bg-surface);
+    background: #000000;
     border: 1px solid var(--border-hover);
-    color: var(--text-secondary);
+    color: #FFFFFF;
     font-size: 12px;
     font-weight: 400;
     line-height: 1.5;
@@ -256,7 +254,7 @@ body {
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
     opacity: 0;
     visibility: hidden;
-    transition: opacity var(--transition-fast), visibility var(--transition-fast);
+    transition: all var(--transition-base);
     pointer-events: none;
     z-index: 10;
 }
@@ -268,7 +266,7 @@ body {
     left: 50%;
     transform: translateX(-50%);
     border: 6px solid transparent;
-    border-top-color: var(--border-hover);
+    border-top-color: #000000;
 }
 
 .form-label__help:hover .tooltip {
@@ -280,15 +278,15 @@ body {
 .form-control {
     width: 100%;
     padding: 10px 12px;
-    background: var(--bg-input);
-    border: 1px solid var(--border-default);
+    background-color: transparent;
+    border: 1px solid #475569;
     border-radius: var(--radius-md);
-    color: var(--text-primary);
+    color: #FFFFFF;
     font-family: inherit;
     font-size: 14px;
     line-height: 1.5;
     outline: none;
-    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+    transition: all 0.2s ease-in-out;
 }
 
 .form-control::placeholder {
@@ -296,12 +294,12 @@ body {
 }
 
 .form-control:hover {
-    border-color: var(--border-hover);
+    border-color: #64748B;
 }
 
 .form-control:focus {
-    border-color: var(--accent-blue);
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
 }
 
 select.form-control {
@@ -316,7 +314,7 @@ select.form-control {
 
 select.form-control option {
     background: var(--bg-surface);
-    color: var(--text-primary);
+    color: #FFFFFF;
 }
 
 /* Input with suffix (%) */
@@ -345,30 +343,34 @@ select.form-control option {
     justify-content: center;
     gap: var(--space-sm);
     width: 100%;
-    padding: 12px var(--space-lg);
-    background: var(--accent-blue);
+    max-width: 400px;
+    margin: var(--space-lg) auto 0;
+    padding: 14px var(--space-lg);
+    background: #10B981;
     border: none;
-    border-radius: var(--radius-md);
-    color: #fff;
+    border-radius: 8px;
+    color: #FFFFFF;
     font-family: inherit;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
     cursor: pointer;
-    transition: background var(--transition-fast);
-    margin-top: var(--space-lg);
+    box-shadow: 0 4px 14px 0 rgba(16, 185, 129, 0.3);
+    transition: all 0.2s ease-in-out;
 }
 
 .btn-primary:hover {
-    background: var(--accent-blue-hover);
+    background: #059669;
+    box-shadow: 0 6px 20px 0 rgba(16, 185, 129, 0.5);
 }
 
 .btn-primary:active {
-    transform: scale(0.99);
+    transform: scale(0.98);
 }
 
 .btn-primary:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+    box-shadow: none;
 }
 
 .btn-primary svg {
@@ -408,7 +410,7 @@ select.form-control option {
     border-radius: var(--radius-lg);
     padding: var(--space-lg);
     text-align: center;
-    transition: border-color var(--transition-fast);
+    transition: all var(--transition-base);
 }
 
 .result-card:hover {

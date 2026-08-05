@@ -21,7 +21,7 @@ fee-sync-app/
 !   +-- index.html            # Template principal
 +-- static/
     +-- css/
-    !   +-- style.css         # Design system SaaS escuro
+    !   +-- style.css         # Design system SaaS com contraste premium e sombras "glow"
     +-- js/
         +-- main.js           # Mascara moeda, fetch, animacoes
 ```
